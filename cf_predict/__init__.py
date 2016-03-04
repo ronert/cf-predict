@@ -4,6 +4,8 @@ import sys
 from flask import Flask
 from config import config
 
+from .api import api_bp
+
 __project__ = 'cf-predict'
 __version__ = '0.0.0'
 
@@ -19,7 +21,6 @@ def create_app(config_name):
     app = Flask(__name__)
     app.config.from_object(config[config_name])
     config[config_name].init_app(app)
-    from cf_predict.main import main as main_blueprint
-    app.register_blueprint(main_blueprint)
+    app.register_blueprint(api_bp)
 
     return app

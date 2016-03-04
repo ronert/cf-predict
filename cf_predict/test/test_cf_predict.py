@@ -5,9 +5,12 @@ import pytest
 @pytest.mark.usefixtures("client_class")
 class TestCf_predict:
     def test_connection(self):
-        rv = self.client.get("/")
+        rv = self.client.get("/helloworld")
         assert rv.status_code == 200
-        assert "Connection Success" in rv.get_data(as_text=True)
+        assert rv.json == {
+            "hello": "world",
+            "version": "1"
+        }
 
     def test_get_root(self):
         pass
