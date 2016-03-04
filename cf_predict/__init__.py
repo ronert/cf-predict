@@ -2,7 +2,7 @@
 
 import sys
 from flask import Flask
-from config import config
+from .config import config
 
 from .api import api_bp
 
