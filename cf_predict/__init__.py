@@ -1,5 +1,3 @@
-"""Package for cf-predict."""
-
 import sys
 from flask import Flask
 from .config import config
