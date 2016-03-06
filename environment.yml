@@ -33,7 +33,6 @@ dependencies:
   - autopep8==1.2.2
   - binaryornot==0.4.0
   - bleach==1.4.2
-  - cf-predict (/Users/ronert/Dropbox/Projects/cf-predict)==0.0.0
   - chardet==2.3.0
   - click==6.3
   - colorama==0.3.6

@@ -3,7 +3,6 @@ astroid==1.4.4
 autopep8==1.2.2
 binaryornot==0.4.0
 bleach==1.4.2
--e git+git@github.com:ronert/cf-predict.git@af5315ceabff4c0a8ddb10b5ecc495d0bbe66dd3#egg=cf_predict
 chardet==2.3.0
 click==6.3
 colorama==0.3.6
