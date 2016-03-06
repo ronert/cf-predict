@@ -1,4 +1,8 @@
+import logging
+from logging import StreamHandler
 import os
+
+
 basedir = os.path.abspath(os.path.dirname(__file__))
 
 
@@ -19,7 +23,7 @@ class DevelopmentConfig(Config):
     DEBUG = True
 
 
-class TestingConfig(Config):
+class UnitTestingConfig(Config):
     TESTING = True
     SQLALCHEMY_DATABASE_URI = (os.environ.get('TEST_DATABASE_URL') or
                                'sqlite:///' + os.path.join(basedir, 'data-test.sqlite'))
@@ -28,13 +32,25 @@ class TestingConfig(Config):
     DEBUG = True
 
 
+class IntegrationTestingConfig(Config):
+    TESTING = True
+    DEBUG = True
+
+
 class ProductionConfig(Config):
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL')
+
+    @classmethod
+    def init_app(cls, app):
+        file_handler = StreamHandler()
+        file_handler.setLevel(logging.WARNING)
+        app.logger.addHandler(file_handler)
 
 
 config = {
     "development": DevelopmentConfig,
-    "testing": TestingConfig,
+    "unit_testing": UnitTestingConfig,
+    "integration_testing": IntegrationTestingConfig,
     "production": ProductionConfig,
     "default": DevelopmentConfig
 }

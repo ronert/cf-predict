@@ -22,5 +22,5 @@ def pytest_configure(config):
 
 @pytest.fixture
 def app():
-    app = create_app("testing")
+    app = create_app("unit_testing")
     return app
