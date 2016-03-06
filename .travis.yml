@@ -19,7 +19,7 @@ env:
   - secure: "C47GeEhpKhKZ/VUH6zXX+drGw9HdZt05thVikBUhXY8UbdbujVsjG5z8w7/GMpCmHIVKrijxQ5ZCF3HSSk/VBHMHPIR9AtYg3gOjuBmzNuhinYgC6JH7fZdDlDUKOU2U92h8gl0j/6CYIkLhPF211bpc6mSeOfSEIdz3YMcpvvc="
 
 install:
-- pip install coveralls scrutinizer-ocular
+- pip install coveralls scrutinizer-ocular flask
 
 before_script:
 - make env
