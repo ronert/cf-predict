@@ -3,12 +3,6 @@ PROJECT := cf-predict
 PACKAGE := cf_predict
 SOURCES := Makefile setup.py $(shell find $(PACKAGE) -name '*.py')
 
-# Python settings
-ifndef TRAVIS
-	PYTHON_MAJOR ?= 3
-	PYTHON_MINOR ?= 5
-endif
-
 # Test settings
 UNIT_TEST_COVERAGE := 88
 INTEGRATION_TEST_COVERAGE := 47
@@ -16,7 +10,7 @@ COMBINED_TEST_COVERAGE := 100
 
 # System paths
 PLATFORM := $(shell python -c 'import sys; print(sys.platform)')
-SYS_PYTHON := python$(PYTHON_MAJOR).$(PYTHON_MINOR)
+SYS_PYTHON := python
 
 
 # Conda environment paths
