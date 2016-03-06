@@ -12,7 +12,7 @@ Cloud Foundry Python Predictive API Boilerplate
 
 ### Requirements
 
-* Python 3.5+
+* Python 3.4+
 
 ### Installation
 
