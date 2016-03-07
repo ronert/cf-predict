@@ -1,15 +1,17 @@
 """Unit test cf_predict"""
 import pytest
+from cf_predict import __version__
 
 
 @pytest.mark.usefixtures("client_class")
 class TestCf_predict:
-    def test_connection(self):
-        rv = self.client.get("/helloworld")
+    def test_catalogue(self):
+        rv = self.client.get("/")
         assert rv.status_code == 200
         assert rv.json == {
-            "hello": "world",
-            "version": "1"
+            "predict_url": "http://localhost/predict",
+            "model_version_url": "http://localhost/model",
+            "api_version": __version__
         }
 
     def test_get_root(self):

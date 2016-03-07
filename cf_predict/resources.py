@@ -1,16 +1,18 @@
-from flask.ext.restful import Resource
-from flask.ext.restful import reqparse
+from flask.ext.restful import Resource, reqparse
+import cf_predict
+from flask import url_for
 
 
-class HelloWorld(Resource):
+class Catalogue(Resource):
     def get(self):
         return {
-            "hello": "world",
-            "version": "1"
+            "predict_url": url_for("api.predict", _external=True),
+            "model_version_url": url_for("api.get_model", _external=True),
+            "api_version": cf_predict.__version__
         }
 
 
-class ModelVersion(Resource):
+class Model(Resource):
     def __init__(self):
         # TODO: only example code
         self.reqparse = reqparse.RequestParser()
@@ -24,7 +26,6 @@ class ModelVersion(Resource):
 
     def put(self, version):
         args = self.reqparse.parse_args()
-
 
 
 class Predict(Resource):
