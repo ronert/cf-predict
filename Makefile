@@ -86,7 +86,11 @@ $(INSTALLED_FLAG): Makefile setup.py requirements.txt
 
 $(PIP):
 	if [ -n "$(CONDA_ENV_PATH)" ]; then . $(BIN)/deactivate; else exit 0; fi && conda env remove -p $(ENV)
-	$(HOME)/anaconda/bin/conda create -y -p $(ENV) -q python=$(PYTHON_MAJOR).$(PYTHON_MINOR) numpy scikit-learn pip wheel flask
+	ifdef PYTHON_MAJOR
+		$(HOME)/anaconda/bin/conda create -y -p $(ENV) -q python=$(PYTHON_MAJOR).$(PYTHON_MINOR) numpy scikit-learn pip wheel flask
+	else ifdef TRAVIS	
+		$(HOME)/anaconda/bin/conda create -y -p $(ENV) -q python=$(TRAVIS_PYTHON_VERSION) numpy scikit-learn pip wheel flask
+	endif
 	. $(BIN)/activate $(ENV)/ && conda remove -y setuptools && $(PIP) install setuptools flask-restful flask-redis && \
 	$(PIP) install --upgrade pip setuptools
 
