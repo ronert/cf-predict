@@ -1,11 +1,20 @@
+# Use bash
+SHELL := /usr/bin/env bash
+
 # Project settings
 PROJECT := cf-predict
 PACKAGE := cf_predict
 SOURCES := Makefile setup.py $(shell find $(PACKAGE) -name '*.py')
 
+# Python settings
+ifndef TRAVIS
+	PYTHON_MAJOR ?= 3
+	PYTHON_MINOR ?= 5
+endif
+
 # Test settings
-UNIT_TEST_COVERAGE := 88
-INTEGRATION_TEST_COVERAGE := 47
+UNIT_TEST_COVERAGE := 80
+INTEGRATION_TEST_COVERAGE := 40
 COMBINED_TEST_COVERAGE := 100
 
 # System paths
@@ -15,9 +24,9 @@ SYS_PYTHON := python
 
 # Conda environment paths
 ENV := env
-ACTIVATE:= source activate cf-predict
+# ACTIVATE := $(shell source activate $(ENV)/)
 OPEN := open
-BIN := ~/anaconda/envs/cf-predict/bin
+BIN := $(ENV)/bin
 
 # Environment executables
 ifndef TRAVIS
@@ -38,7 +47,6 @@ NOSE := $(BIN_)nosetests
 PYTEST := $(BIN_)py.test
 COVERAGE := $(BIN_)coverage
 SNIFFER := $(BIN_)sniffer
-HONCHO := $(ACTIVATE) && honcho
 
 # Flags for PHONY targets
 INSTALLED_FLAG := $(ENV)/.installed
@@ -77,7 +85,9 @@ $(INSTALLED_FLAG): Makefile setup.py requirements.txt
 	@ touch $(INSTALLED_FLAG)  # flag to indicate package is installed
 
 $(PIP):
-	$(SYS_PYTHON) -m venv --clear $(ENV)
+	if [ -n "$(CONDA_ENV_PATH)" ]; then . $(BIN)/deactivate; else exit 0; fi && conda env remove -p $(ENV)
+	conda create -y -p $(ENV) -q python=$(PYTHON_MAJOR).$(PYTHON_MINOR) numpy scikit-learn pip wheel flask
+	. $(BIN)/activate $(ENV)/ && conda remove -y setuptools && $(PIP) install setuptools flask-restful flask-redis && \
 	$(PIP) install --upgrade pip setuptools
 
 # Tools Installation ###########################################################
@@ -253,6 +263,7 @@ clean-all: clean .clean-env .clean-workspace
 
 .PHONY: .clean-env
 .clean-env: clean
+	@ if [ -n "$(CONDA_ENV_PATH)" ]; then . $(BIN)/activate root; else exit 0; fi
 	rm -rf $(ENV)
 
 .PHONY: .clean-workspace
