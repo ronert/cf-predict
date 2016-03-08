@@ -83,16 +83,19 @@ env: $(PIP) $(INSTALLED_FLAG)
 $(INSTALLED_FLAG): Makefile setup.py requirements.txt
 	VIRTUAL_ENV=$(ENV) $(PYTHON) setup.py develop
 	@ touch $(INSTALLED_FLAG)  # flag to indicate package is installed
-
-$(PIP):
-	if [ -n "$(CONDA_ENV_PATH)" ]; then . $(BIN)/deactivate; else exit 0; fi && conda env remove -p $(ENV)
-	ifdef PYTHON_MAJOR
-		$(HOME)/anaconda/bin/conda create -y -p $(ENV) -q python=$(PYTHON_MAJOR).$(PYTHON_MINOR) numpy scikit-learn pip wheel flask
-	else ifdef TRAVIS	
+ifdef TRAVIS
+	$(PIP):
+		if [ -n "$(CONDA_ENV_PATH)" ]; then . $(BIN)/deactivate; else exit 0; fi && conda env remove -p $(ENV)
 		$(HOME)/anaconda/bin/conda create -y -p $(ENV) -q python=$(TRAVIS_PYTHON_VERSION) numpy scikit-learn pip wheel flask
-	endif
-	. $(BIN)/activate $(ENV)/ && conda remove -y setuptools && $(PIP) install setuptools flask-restful flask-redis && \
-	$(PIP) install --upgrade pip setuptools
+		. $(BIN)/activate $(ENV)/ && conda remove -y setuptools && $(PIP) install setuptools flask-restful flask-redis && \
+		$(PIP) install --upgrade pip setuptools
+else
+	$(PIP):
+		if [ -n "$(CONDA_ENV_PATH)" ]; then . $(BIN)/deactivate; else exit 0; fi && conda env remove -p $(ENV)
+		$(HOME)/anaconda/bin/conda create -y -p $(ENV) -q python=$(PYTHON_MAJOR).$(PYTHON_MINOR) numpy scikit-learn pip wheel flask
+		. $(BIN)/activate $(ENV)/ && conda remove -y setuptools && $(PIP) install setuptools flask-restful flask-redis && \
+		$(PIP) install --upgrade pip setuptools
+endif
 
 # Tools Installation ###########################################################
 
