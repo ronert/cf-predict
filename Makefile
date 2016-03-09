@@ -87,8 +87,7 @@ ifdef TRAVIS
 $(PIP):
 	if [ -n "$(CONDA_ENV_PATH)" ]; then . $(BIN)/deactivate; else exit 0; fi && conda env remove -p $(ENV)
 	$(HOME)/anaconda/bin/conda create -y -p $(ENV) -q python=$(TRAVIS_PYTHON_VERSION) numpy scikit-learn pip wheel flask
-	. $(BIN)/activate $(ENV)/ && conda remove -y setuptools && $(PIP) install setuptools flask-restful flask-redis && \
-	$(PIP) install --upgrade pip setuptools
+	. $(BIN)/activate $(ENV)/ && $(PIP) install flask-restful flask-redis
 else
 $(PIP):
 	if [ -n "$(CONDA_ENV_PATH)" ]; then . $(BIN)/deactivate; else exit 0; fi && conda env remove -p $(ENV)
@@ -248,7 +247,7 @@ clean: .clean-dist .clean-test .clean-doc .clean-build
 	rm -rf $(ALL_FLAG)
 
 .PHONY: clean-all
-clean-all: clean .clean-env .clean-workspace
+clean-all: clean .clean-env
 
 .PHONY: .clean-build
 .clean-build:
@@ -272,10 +271,6 @@ clean-all: clean .clean-env .clean-workspace
 .clean-env: clean
 	@ if [ -n "$(CONDA_ENV_PATH)" ]; then . $(BIN)/activate root; else exit 0; fi
 	rm -rf $(ENV)
-
-.PHONY: .clean-workspace
-.clean-workspace:
-	rm -rf *.sublime-workspace
 
 # Release ######################################################################
 
