@@ -6,5 +6,6 @@ from cf_predict import create_app
 
 @pytest.fixture
 def app():
+    """Create a Flask test client."""
     app = create_app("integration_testing")
     return app

@@ -22,5 +22,6 @@ def pytest_configure(config):
 
 @pytest.fixture
 def app():
+    """Create a Flask test client."""
     app = create_app("unit_testing")
     return app

@@ -16,6 +16,7 @@ if sys.version_info < PYTHON_VERSION:  # pragma: no cover (manual test)
 
 
 def create_app(config_name):
+    """Flask application factory."""
     app = Flask(__name__)
     app.config.from_object(config[config_name])
     config[config_name].init_app(app)
