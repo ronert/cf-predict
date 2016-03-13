@@ -1,5 +1,7 @@
 import sys
 from flask import Flask
+from mockredis import MockRedis
+from flask_redis import FlaskRedis
 from .config import config
 
 from .api import api_bp
@@ -15,11 +17,23 @@ if sys.version_info < PYTHON_VERSION:  # pragma: no cover (manual test)
     sys.exit("Python {}.{}+ is required.".format(*PYTHON_VERSION))
 
 
+class MockRedisWrapper(MockRedis):
+    """A wrapper to add the `from_url` classmethod."""
+
+    @classmethod
+    def from_url(cls, *args, **kwargs):
+        return cls()
+
+
 def create_app(config_name):
     """Flask application factory."""
     app = Flask(__name__)
     app.config.from_object(config[config_name])
     config[config_name].init_app(app)
+    if app.testing:
+        redis_store = FlaskRedis.from_custom_provider(MockRedisWrapper)
+    else:
+        redis_store = FlaskRedis()
+    redis_store.init_app(app)
     app.register_blueprint(api_bp)
-
     return app
