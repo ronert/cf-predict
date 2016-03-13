@@ -35,7 +35,7 @@ install:
   - if [ -d ${TRAVIS_BUILD_DIR}/env ]; then source deactivate ; conda env remove -p env/; fi
   - conda create -y -p $TRAVIS_BUILD_DIR/env -q python=$TRAVIS_PYTHON_VERSION numpy scikit-learn pip wheel
   - source activate env/
-  - pip install coveralls scrutinizer-ocular flask flask-restful flask-redis
+  - pip install coveralls scrutinizer-ocular flask flask-restful flask-redis mockredis
   - python setup.py install
 
 before_script:

@@ -14,20 +14,28 @@ class TestCf_predict:
             "api_version": __version__
         }
 
-    def test_put_version_valid(self):
+    def test_get_version(self):
+        rv = self.client.get("/model")
+        assert rv.status_code == 200
+        assert rv.json == {
+            "model_version": "1.2.0"
+        }
+
+    def test_put_version_valid_latest(self):
         rv = self.client.put("/model?version=latest")
         assert rv.status_code == 200
         assert rv.json == {
-            "model_version": "1.0.0"
+            "model_version": "1.2.0"
+        }
+
+    def test_put_version_valid_specific(self):
+        rv = self.client.put("/model?version=1.1.0")
+        assert rv.status_code == 200
+        assert rv.json == {
+            "model_version": "1.1.0"
         }
 
     def test_put_version_invalid(self):
-        pass
-
-    def test_get_version_valid(self):
-        pass
-
-    def test_get_version_invalid(self):
         pass
 
     def test_get_prediction_valid_input(self):

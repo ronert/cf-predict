@@ -1,6 +1,13 @@
+import pickle
+import os
 from flask_restful import Resource, reqparse
-from flask import url_for
+from flask import url_for, current_app
 import cf_predict
+
+
+def get_db():
+    """Fetch Redis client."""
+    return current_app.extensions["redis"]
 
 
 class Catalogue(Resource):
@@ -16,9 +23,28 @@ class Catalogue(Resource):
 
 
 class Model(Resource):
+    def __init__(self):
+        self.r = get_db()
+        self.version = os.getenv("MODEL_VERSION") or "latest"
+        if self.version == "latest":
+            self.version = self.find_latest_version(self.version)
+        try:
+            self.model = self.load_model(self.version)
+        except TypeError:
+            current_app.logger.warning("No model found in Redis")
+
+    def find_latest_version(self, version):
+        """Find model with the highest version number in Redis."""
+        latest_version = max(self.r.keys())
+        return latest_version
+
+    def load_model(self, version):
+        """Deserialize and load model."""
+        return pickle.loads(self.r.get(version))
+
     def get(self):
         """Get current model version."""
-        return {"Version": "1.0"}
+        return {"model_version": self.version}
 
     def put(self):
         """Load a specific model version into memory from Redis.
@@ -28,7 +54,13 @@ class Model(Resource):
         parser = reqparse.RequestParser()
         parser.add_argument("version", type=str, required=True)
         args = parser.parse_args()
-        return args["version"]
+        version = args["version"]
+        if version == "latest":
+            self.version = self.find_latest_version(version)
+        else:
+            self.version = args["version"]
+        self.model = self.load_model(self.version)
+        return {"model_version": self.version}
 
 
 class Predict(Resource):

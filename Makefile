@@ -15,7 +15,7 @@ endif
 # Test settings
 UNIT_TEST_COVERAGE := 80
 INTEGRATION_TEST_COVERAGE := 40
-COMBINED_TEST_COVERAGE := 100
+COMBINED_TEST_COVERAGE := 80
 
 # System paths
 PLATFORM := $(shell python -c 'import sys; print(sys.platform)')
@@ -87,12 +87,12 @@ ifdef TRAVIS
 $(PIP):
 	if [ -n "$(CONDA_ENV_PATH)" ]; then . $(BIN)/deactivate; else exit 0; fi && conda env remove -p $(ENV)
 	$(HOME)/anaconda/bin/conda create -y -p $(ENV) -q python=$(TRAVIS_PYTHON_VERSION) numpy scikit-learn pip wheel flask
-	. $(BIN)/activate $(ENV)/ && $(PIP) install flask-restful flask-redis
+	. $(BIN)/activate $(ENV)/ && $(PIP) install flask-restful flask-redis mockredis
 else
 $(PIP):
 	if [ -n "$(CONDA_ENV_PATH)" ]; then . $(BIN)/deactivate; else exit 0; fi && conda env remove -p $(ENV)
 	$(HOME)/anaconda/bin/conda create -y -p $(ENV) -q python=$(PYTHON_MAJOR).$(PYTHON_MINOR) numpy scikit-learn pip wheel flask
-	. $(BIN)/activate $(ENV)/ && conda remove -y setuptools && $(PIP) install setuptools flask-restful flask-redis && \
+	. $(BIN)/activate $(ENV)/ && conda remove -y setuptools && $(PIP) install setuptools flask-restful flask-redis mockredis && \
 	$(PIP) install --upgrade pip setuptools
 endif
 
@@ -200,7 +200,7 @@ fix: depends-dev
 
 RANDOM_SEED ?= $(shell date +%s)
 
-PYTEST_CORE_OPTS := --doctest-modules -r xXw -vv
+PYTEST_CORE_OPTS := -r xXw -vv
 PYTEST_COV_OPTS := --cov=$(PACKAGE) --no-cov-on-fail --cov-report=term-missing
 PYTEST_RANDOM_OPTS := --random --random-seed=$(RANDOM_SEED)
 
