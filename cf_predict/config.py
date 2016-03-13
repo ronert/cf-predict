@@ -1,3 +1,4 @@
+import json
 import logging
 import os
 
@@ -34,10 +35,10 @@ class IntegrationTestingConfig(Config):
 
 
 class ProductionConfig(Config):
-    # services = json.loads(os.getenv("VCAP_SERVICES"))
-    # redis_env = services["p-redis"][0]["credentials"]
-    # REDIS_URL = "redis://" + redis_env["password"] + "@" + redis_env["host"] + ":" + redis_env["port"]
-    pass
+    if os.getenv("VCAP_SERVICES"):
+        services = json.loads(os.getenv("VCAP_SERVICES"))
+        redis_env = services["p-redis"][0]["credentials"]
+        REDIS_URL = "redis://" + redis_env["password"] + "@" + redis_env["host"] + ":" + redis_env["port"]
 
 
 config = {
