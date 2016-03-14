@@ -10,6 +10,8 @@ Cloud Foundry Python Predictive API Boilerplate
 
 ## About
 
+The cf-predict microservice is part of a pluggable ecosystem of cloud native data science microservices for Cloud Foundry.
+
 ![Data Science Microservices](https://dropshare-ro.s3-eu-central-1.amazonaws.com/Microservices.jpg) 
 
 ## Getting Started
