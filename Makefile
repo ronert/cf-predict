@@ -87,7 +87,7 @@ ifdef TRAVIS
 $(PIP):
 	if [ -n "$(CONDA_ENV_PATH)" ]; then . $(BIN)/deactivate; else exit 0; fi && conda env remove -p $(ENV)
 	$(HOME)/anaconda/bin/conda create -y -p $(ENV) -q python=$(TRAVIS_PYTHON_VERSION) numpy scikit-learn pip wheel flask
-	. $(BIN)/activate $(ENV)/ && $(PIP) install flask-restful flask-redis mockredis
+	. $(BIN)/activate $(ENV)/ && $(PIP) install flask-restful flask-redis mockredis coveralls
 else
 $(PIP):
 	if [ -n "$(CONDA_ENV_PATH)" ]; then . $(BIN)/deactivate; else exit 0; fi && conda env remove -p $(ENV)
@@ -104,7 +104,7 @@ depends: depends-ci depends-doc depends-dev
 .PHONY: depends-ci
 depends-ci: env Makefile $(DEPENDS_CI_FLAG)
 $(DEPENDS_CI_FLAG): Makefile
-	$(PIP) install --upgrade pep8 pep257 pylint coverage pytest pytest-describe pytest-expecter pytest-cov pytest-random pytest-runfailed
+	$(PIP) install --upgrade pep8 pep257 pylint coverage coveralls pytest pytest-describe pytest-expecter pytest-cov pytest-random pytest-runfailed
 	@ touch $(DEPENDS_CI_FLAG)  # flag to indicate dependencies are installed
 
 .PHONY: depends-doc
