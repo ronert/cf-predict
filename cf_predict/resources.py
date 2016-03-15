@@ -31,7 +31,7 @@ class Model(Resource):
         try:
             self.model = self.load_model(self.version)
         except TypeError:
-            current_app.logger.warning("No model found in Redis")
+            current_app.logger.warning("No model found")
 
     def find_latest_version(self, version):
         """Find model with the highest version number in Redis."""
@@ -58,9 +58,14 @@ class Model(Resource):
         if version == "latest":
             self.version = self.find_latest_version(version)
         else:
-            self.version = args["version"]
-        self.model = self.load_model(self.version)
-        return {"model_version": self.version}
+            self.version = version
+        try:
+            self.model = self.load_model(self.version)
+            return {"model_version": self.version}
+        except TypeError:
+            message = {"message": "Model version {} not found".format(version)}
+            current_app.logger.warning(message)
+            return message, 404
 
 
 class Predict(Resource):

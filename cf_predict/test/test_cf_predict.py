@@ -36,7 +36,11 @@ class TestCf_predict:
         }
 
     def test_put_version_invalid(self):
-        pass
+        rv = self.client.put("/model?version=lol")
+        assert rv.status_code == 404
+        assert rv.json == {
+            "message": "Model version lol not found"
+        }
 
     def test_get_prediction_valid_input(self):
         pass
