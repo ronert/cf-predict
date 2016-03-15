@@ -1,4 +1,5 @@
 import sys
+import os
 from flask import Flask
 from mockredis import MockRedis
 from flask_redis import FlaskRedis
@@ -37,3 +38,8 @@ def create_app(config_name):
     redis_store.init_app(app)
     app.register_blueprint(api_bp)
     return app
+
+
+if __name__ == '__main__':
+    app = create_app(os.getenv('FLASK_CONFIG') or 'default')
+    app.run(host=app.config['HOST'], port=app.config['PORT'])

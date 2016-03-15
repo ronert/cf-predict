@@ -76,6 +76,15 @@ watch: depends .clean-test
 	@ rm -rf $(FAILED_FLAG)
 	$(SNIFFER)
 
+.PHONY: deploy
+ifdef PORT
+deploy: install
+	gunicorn --bind 0.0.0.0:$(PORT) cf_predict.wsgi:app
+else
+deploy: install
+	$(PYTHON) -m cf_predict
+endif
+
 # Development Installation #####################################################
 
 .PHONY: env
