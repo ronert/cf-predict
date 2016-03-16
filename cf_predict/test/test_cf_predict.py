@@ -23,7 +23,7 @@ class TestCf_predict:
     def test_no_model_in_db(self, monkeypatch, caplog):
         monkeypatch.setattr("cf_predict.resources.get_db", lambda: {})
         self.client.get("/model")
-        assert "No model found" in caplog.text()
+        assert "No model" in caplog.text()
 
     def test_get_version(self):
         rv = self.client.get("/model")
