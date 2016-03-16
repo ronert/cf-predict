@@ -3,4 +3,6 @@ branch = true
 omit =
     */env/*
     */test/*
+    cf_predict/wsgi.py
+    cf_predict/__main__.py
 source = cf_predict
