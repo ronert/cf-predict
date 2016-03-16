@@ -5,4 +5,5 @@ omit =
     */test/*
     cf_predict/wsgi.py
     cf_predict/__main__.py
+    cf_predict/config.py
 source = cf_predict
