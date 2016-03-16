@@ -31,7 +31,7 @@ class Model(Resource):
                 self.version = self.find_latest_version(self.version)
                 self.model = self.load_model(self.version)
             except (TypeError, ValueError):
-                current_app.logger.warning("No model found")
+                current_app.logger.warning("No model {} found".format(self.version))
 
     def find_latest_version(self, version):
         """Find model with the highest version number in Redis."""
