@@ -1,0 +1,14 @@
+site_name: cf_predict
+site_description: Cloud Foundry Python Predictive API Boilerplate
+site_author: Ronert Obst
+repo_url: https://github.com/ronert/cf-predict
+# google_analytics: ['XX-XXXXXXXX-XX', 'auto']
+
+theme: mkdocs
+
+pages:
+- Home: index.md
+- About:
+  - 'Release Notes': about/changes.md
+  - Contributing: about/contributing.md
+  - License: about/license.md
