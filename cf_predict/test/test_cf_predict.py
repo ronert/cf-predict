@@ -1,6 +1,7 @@
 """Unit test cf_predict"""
 import pytest
 from cf_predict import __version__
+from cf_predict.resources import get_db
 
 
 @pytest.mark.usefixtures("client_class")
@@ -13,6 +14,16 @@ class TestCf_predict:
             "model_version_url": "http://localhost/model",
             "api_version": __version__
         }
+
+    def test_get_db(self):
+        r = get_db()
+        r.set("test", 5)
+        assert int(r.get("test")) == 5
+
+    def test_no_model_in_db(self, monkeypatch, caplog):
+        monkeypatch.setattr("cf_predict.resources.get_db", lambda: {})
+        self.client.get("/model")
+        assert "No model found" in caplog.text()
 
     def test_get_version(self):
         rv = self.client.get("/model")

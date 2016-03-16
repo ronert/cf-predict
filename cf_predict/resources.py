@@ -27,11 +27,11 @@ class Model(Resource):
         self.r = get_db()
         self.version = os.getenv("MODEL_VERSION") or "latest"
         if self.version == "latest":
-            self.version = self.find_latest_version(self.version)
-        try:
-            self.model = self.load_model(self.version)
-        except TypeError:
-            current_app.logger.warning("No model found")
+            try:
+                self.version = self.find_latest_version(self.version)
+                self.model = self.load_model(self.version)
+            except (TypeError, ValueError):
+                current_app.logger.warning("No model found")
 
     def find_latest_version(self, version):
         """Find model with the highest version number in Redis."""
@@ -55,14 +55,14 @@ class Model(Resource):
         parser.add_argument("version", type=str, required=True)
         args = parser.parse_args()
         version = args["version"]
-        if version == "latest":
-            self.version = self.find_latest_version(version)
-        else:
-            self.version = version
         try:
-            self.model = self.load_model(self.version)
+            if version == "latest":
+                self.version = self.find_latest_version(version)
+            else:
+                self.version = version
+                self.model = self.load_model(self.version)
             return {"model_version": self.version}
-        except TypeError:
+        except (TypeError, ValueError):
             message = {"message": "Model version {} not found".format(version)}
             current_app.logger.warning(message)
             return message, 404
