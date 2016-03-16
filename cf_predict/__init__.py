@@ -40,6 +40,6 @@ def create_app(config_name):
     return app
 
 
-if __name__ == '__main__':
+if __name__ == '__main__':  # pragma: no cover
     app = create_app(os.getenv('FLASK_CONFIG') or 'default')
     app.run(host=app.config['HOST'], port=app.config['PORT'])
