@@ -4,6 +4,7 @@ import pickle
 import numpy as np
 import pytest
 from sklearn import linear_model, tree, svm
+from mockredis import MockRedis
 
 from cf_predict import create_app
 
@@ -35,14 +36,17 @@ def app(monkeypatch):
 
 def models():
     """Create some sample machine learning models."""
-    X = np.random.random_sample((20, 5))
-    y = np.random.random_sample(20)
+    rng = np.random.RandomState(42)
+    X = rng.random_sample((20, 5))
+    y = rng.random_sample(20)
     lm = linear_model.LinearRegression()
     dt = tree.DecisionTreeRegressor()
     svr = svm.SVR()
     lm.fit(X, y)
     dt.fit(X, y)
     svr.fit(X, y)
-    return {"1.0.0": pickle.dumps(lm),
-            "1.1.0": pickle.dumps(dt),
-            "1.2.0": pickle.dumps(svr)}
+    r = MockRedis()
+    r.set("1.0.0", pickle.dumps(lm))
+    r.set("1.1.0", pickle.dumps(dt))
+    r.set("1.2.0", pickle.dumps(svr))
+    return r
