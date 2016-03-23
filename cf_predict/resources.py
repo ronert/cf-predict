@@ -35,7 +35,8 @@ class Model(Resource):
 
     def find_latest_version(self, version):
         """Find model with the highest version number in Redis."""
-        latest_version = max(self.r.keys())
+	keys = [key.decode("utf-8") for key in self.r.scan_iter() if key is not b"version"]
+	latest_version = max(keys)
         return latest_version
 
     def load_model(self, version):
