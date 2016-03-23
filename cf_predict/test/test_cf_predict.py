@@ -1,5 +1,12 @@
 """Unit test cf_predict"""
+import json
+import pickle
+
+import numpy as np
 import pytest
+
+from mockredis import MockRedis
+from .conftest import models
 from cf_predict import __version__
 from cf_predict.resources import get_db
 
@@ -10,8 +17,7 @@ class TestCf_predict:
         rv = self.client.get("/")
         assert rv.status_code == 200
         assert rv.json == {
-            "predict_url": "http://localhost/predict",
-            "model_version_url": "http://localhost/model",
+            "model_url": "http://localhost/model",
             "api_version": __version__
         }
 
@@ -21,7 +27,7 @@ class TestCf_predict:
         assert int(r.get("test")) == 5
 
     def test_no_model_in_db(self, monkeypatch, caplog):
-        monkeypatch.setattr("cf_predict.resources.get_db", lambda: {})
+        monkeypatch.setattr("cf_predict.resources.get_db", MockRedis)
         self.client.get("/model")
         assert "No model" in caplog.text()
 
@@ -53,14 +59,23 @@ class TestCf_predict:
             "message": "Model version lol not found"
         }
 
-    def test_get_prediction_valid_input(self):
-        pass
-
-    def test_get_prediction_invalid_id(self):
-        pass
+    def test_post_prediction_valid_input(self):
+        features = {"features": [1, 2, 3, 4, 5]}
+        model = pickle.loads(models()["1.2.0"])
+        rv = self.client.post("/model",
+                              data=json.dumps(features),
+                              content_type="application/json")
+        assert rv.status_code == 200
+        assert rv.json == {
+            "prediction": model.predict(np.array(features["features"].reshape(1, -1)))
+        }
 
     def test_get_prediction_invalid_features(self):
-        pass
-
-    def test_get_prediction_valid_json_output(self):
-        pass
+        features = {"features": [1, 2, "lol", 4, 5]}
+        rv = self.client.post("/model",
+                              data=json.dumps(features),
+                              content_type="application/json")
+        assert rv.status_code == 400
+        assert rv.json == {
+            "message": "Features [1, 2, 'lol', 4, 5] do not match expected input"
+        }
