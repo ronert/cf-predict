@@ -16,12 +16,12 @@ class Catalogue(Resource):
     def get(self):
         """Show a catalogue of available endpoints."""
         return {
-            "model_url": url_for("api.model", _external=True),
+            "predict_url": url_for("api.predict", _external=True),
             "api_version": cf_predict.__version__
         }
 
 
-class Model(Resource):
+class Predict(Resource):
     def __init__(self):
         self.r = get_db()
         self.version = os.getenv("MODEL_VERSION") or "latest"

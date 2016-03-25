@@ -18,7 +18,7 @@ class TestCf_predict:
         rv = self.client.get("/")
         assert rv.status_code == 200
         assert rv.json == {
-            "model_url": "http://localhost/model",
+            "predict_url": "http://localhost/predict",
             "api_version": __version__
         }
 
@@ -29,22 +29,22 @@ class TestCf_predict:
 
     def test_no_model_in_db(self, monkeypatch, caplog):
         monkeypatch.setattr("cf_predict.resources.get_db", MockRedis)
-        pytest.raises(ValueError, self.client.get, "/model")
+        pytest.raises(ValueError, self.client.get, "/predict")
         assert "No model" in caplog.text()
 
     def test_model_pickle_error(self, monkeypatch, caplog):
         def broken_pickle(anything):
             raise IOError
         monkeypatch.setattr("pickle.loads", broken_pickle)
-        pytest.raises(IOError, self.client.get, "/model")
+        pytest.raises(IOError, self.client.get, "/predict")
         assert "could not be unpickled" in caplog.text()
 
     def test_model_no_predict_error(self, monkeypatch, caplog, broken_model):
         monkeypatch.setattr("cf_predict.resources.get_db", broken_model)
-        pytest.raises(NoPredictMethod, self.client.get, "/model")
+        pytest.raises(NoPredictMethod, self.client.get, "/predict")
 
     def test_get_version(self):
-        rv = self.client.get("/model")
+        rv = self.client.get("/predict")
         assert rv.status_code == 200
         assert rv.json == {
             "model_version": "1.2.0"
@@ -53,7 +53,7 @@ class TestCf_predict:
     def test_post_prediction_valid_features_one_record(self):
         features = {"features": [1, 2, 3, 4, 5]}
         model = pickle.loads(models().get("1.2.0"))
-        rv = self.client.post("/model",
+        rv = self.client.post("/predict",
                               data=json.dumps(features),
                               content_type="application/json")
         assert rv.status_code == 200
@@ -67,7 +67,7 @@ class TestCf_predict:
                                  [6, 7, 8, 9, 1],
                                  [2, 3, 4, 5, 6]]}
         model = pickle.loads(models().get("1.2.0"))
-        rv = self.client.post("/model",
+        rv = self.client.post("/predict",
                               data=json.dumps(features),
                               content_type="application/json")
         assert rv.status_code == 200
@@ -78,7 +78,7 @@ class TestCf_predict:
 
     def test_post_prediction_invalid_features(self):
         features = {"features": [1, 2, "lol", 4, 5]}
-        rv = self.client.post("/model",
+        rv = self.client.post("/predict",
                               data=json.dumps(features),
                               content_type="application/json")
         assert rv.status_code == 400
@@ -88,7 +88,7 @@ class TestCf_predict:
 
     def test_post_prediction_invalid_json(self):
         features = '{"features: [1, 2, 3, 4, 5]'
-        rv = self.client.post("/model",
+        rv = self.client.post("/predict",
                               data=features,
                               content_type="application/json")
         assert rv.status_code == 400
@@ -98,7 +98,7 @@ class TestCf_predict:
 
     def test_post_prediction_wrong_key(self):
         features = {"lol": [1, 2, 3, 4, 5]}
-        rv = self.client.post("/model",
+        rv = self.client.post("/predict",
                               data=json.dumps(features),
                               content_type="application/json")
         assert rv.status_code == 400
