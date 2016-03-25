@@ -37,6 +37,7 @@ class TestCf_predict:
             raise IOError
         monkeypatch.setattr("pickle.loads", broken_pickle)
         pytest.raises(IOError, self.client.get, "/model")
+        assert "could not be unpickled" in caplog.text()
 
     def test_model_no_predict_error(self, monkeypatch, caplog, broken_model):
         monkeypatch.setattr("cf_predict.resources.get_db", broken_model)
@@ -49,7 +50,7 @@ class TestCf_predict:
             "model_version": "1.2.0"
         }
 
-    def test_post_prediction_valid_features(self):
+    def test_post_prediction_valid_features_one_record(self):
         features = {"features": [1, 2, 3, 4, 5]}
         model = pickle.loads(models().get("1.2.0"))
         rv = self.client.post("/model",
@@ -61,6 +62,20 @@ class TestCf_predict:
             "prediction": list(model.predict(np.array(features["features"]).reshape(1, -1)))
         }
 
+    def test_post_prediction_valid_features_multiple_records(self):
+        features = {"features": [[1, 2, 3, 4, 5],
+                                 [6, 7, 8, 9, 1],
+                                 [2, 3, 4, 5, 6]]}
+        model = pickle.loads(models().get("1.2.0"))
+        rv = self.client.post("/model",
+                              data=json.dumps(features),
+                              content_type="application/json")
+        assert rv.status_code == 200
+        assert rv.json == {
+            "model_version": "1.2.0",
+            "prediction": list(model.predict(np.array(features["features"])))
+        }
+
     def test_post_prediction_invalid_features(self):
         features = {"features": [1, 2, "lol", 4, 5]}
         rv = self.client.post("/model",
@@ -69,4 +84,24 @@ class TestCf_predict:
         assert rv.status_code == 400
         assert rv.json == {
             "message": "Features [1, 2, 'lol', 4, 5] do not match expected input for model version 1.2.0"
+        }
+
+    def test_post_prediction_invalid_json(self):
+        features = '{"features: [1, 2, 3, 4, 5]'
+        rv = self.client.post("/model",
+                              data=features,
+                              content_type="application/json")
+        assert rv.status_code == 400
+        assert rv.json == {
+            "message": "The browser (or proxy) sent a request that this server could not understand."
+        }
+
+    def test_post_prediction_wrong_key(self):
+        features = {"lol": [1, 2, 3, 4, 5]}
+        rv = self.client.post("/model",
+                              data=json.dumps(features),
+                              content_type="application/json")
+        assert rv.status_code == 400
+        assert rv.json == {
+            "message": "Features not found in {'lol': [1, 2, 3, 4, 5]}"
         }

@@ -1,5 +1,4 @@
 import pickle
-import json
 import os
 import numpy as np
 from flask_restful import Resource, request
@@ -34,7 +33,7 @@ class Model(Resource):
                 raise e
             try:
                 self.model = self.load_model(self.version)
-            except (pickle.UnpicklingError, AttributeError, EOFError, ImportError, IndexError) as e:
+            except (pickle.UnpicklingError, IOError, AttributeError, EOFError, ImportError, IndexError) as e:
                 current_app.logger.error("Model {} could not be unpickled".format(self.version))
                 raise e
             if not hasattr(self.model, 'predict'):
@@ -61,8 +60,6 @@ class Model(Resource):
         """
         try:
             raw_features = request.get_json()["features"]
-        except json.JSONDecodeError:
-            return {"message": "Invalid json {}".format(request.data)}, 400
         except KeyError:
             return {"message": "Features not found in {}".format(request.get_json())}, 400
         try:
