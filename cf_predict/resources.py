@@ -1,6 +1,5 @@
 import pickle
 import os
-from flask_restful import Resource, reqparse
 from flask import url_for, current_app
 import cf_predict
 
@@ -32,7 +31,7 @@ class Model(Resource):
 
     def find_latest_version(self, version):
         """Find model with the highest version number in Redis."""
-        keys = [key.decode("utf-8") for key in self.r.scan_iter() if key is not b"version"]
+	keys = [key.decode("utf-8") for key in self.r.scan_iter()]
         latest_version = max(keys)
         return latest_version
 
@@ -43,28 +42,6 @@ class Model(Resource):
     def get(self):
         """Get current model version."""
         return {"model_version": self.version}
-
-    def put(self):
-        """Load a specific model version into memory from Redis.
-
-        Either specifiy the model version or 'latest'.
-        """
-        parser = reqparse.RequestParser()
-        parser.add_argument("version", type=str, required=True)
-        args = parser.parse_args()
-        version = args["version"]
-        try:
-            if version == "latest":
-                self.version = self.find_latest_version(version)
-            else:
-                self.version = version
-                self.model = self.load_model(self.version)
-                self.r.set("version", version)
-            return {"model_version": self.version}
-        except (TypeError, ValueError):
-            message = {"message": "Model version {} not found".format(version)}
-            current_app.logger.warning(message)
-            return message, 404
 
     def post(self):
         """Get prediction from model.

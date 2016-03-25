@@ -38,28 +38,6 @@ class TestCf_predict:
             "model_version": "1.2.0"
         }
 
-    def test_put_version_valid_latest(self):
-        rv = self.client.put("/model?version=latest")
-        assert rv.status_code == 200
-        assert rv.json == {
-            "model_version": "1.2.0"
-        }
-
-    def test_put_version_valid_specific(self):
-        rv = self.client.put("/model?version=1.1.0")
-        assert rv.status_code == 200
-        assert rv.json == {
-            "model_version": "1.1.0"
-        }
-
-    def test_put_version_invalid(self):
-        rv = self.client.put("/model?version=lol")
-        assert rv.status_code == 404
-        assert rv.json == {
-            "message": "Model version lol not found"
-        }
-
-    def test_post_prediction_valid_input(self):
         features = {"features": [1, 2, 3, 4, 5]}
         model = pickle.loads(models()["1.2.0"])
         rv = self.client.post("/model",
