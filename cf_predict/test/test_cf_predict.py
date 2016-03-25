@@ -9,6 +9,7 @@ from mockredis import MockRedis
 from .conftest import models
 from cf_predict import __version__
 from cf_predict.resources import get_db
+from cf_predict.errors import NoPredictMethod
 
 
 @pytest.mark.usefixtures("client_class")
@@ -28,8 +29,18 @@ class TestCf_predict:
 
     def test_no_model_in_db(self, monkeypatch, caplog):
         monkeypatch.setattr("cf_predict.resources.get_db", MockRedis)
-        self.client.get("/model")
+	pytest.raises(ValueError, self.client.get, "/model")
         assert "No model" in caplog.text()
+
+    def test_model_pickle_error(self, monkeypatch, caplog):
+	def broken_pickle(object):
+	    raise IOError
+	monkeypatch.setattr("pickle.loads", broken_pickle)
+	pytest.raises(IOError, self.client.get, "/model")
+
+    def test_model_no_predict_error(self, monkeypatch, caplog, broken_model):
+	monkeypatch.setattr("cf_predict.resources.get_db", broken_model)
+	pytest.raises(NoPredictMethod, self.client.get, "/model")
 
     def test_get_version(self):
         rv = self.client.get("/model")

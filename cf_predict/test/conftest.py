@@ -26,14 +26,6 @@ def pytest_configure(config):
     terminal.TerminalReporter = QuietReporter
 
 
-@pytest.fixture
-def app(monkeypatch):
-    """Create a Flask test client."""
-    monkeypatch.setattr("cf_predict.resources.get_db", models)
-    app = create_app("unit_testing")
-    return app
-
-
 def models():
     """Create some sample machine learning models."""
     rng = np.random.RandomState(42)
@@ -50,3 +42,18 @@ def models():
     r.set("1.1.0", pickle.dumps(dt))
     r.set("1.2.0", pickle.dumps(svr))
     return r
+
+
+@pytest.fixture
+def broken_model():
+    r = MockRedis()
+    r.set("1.2.0", pickle.dumps("lol"))
+    return lambda: r
+
+
+@pytest.fixture
+def app(monkeypatch):
+    """Create a Flask test client."""
+    monkeypatch.setattr("cf_predict.resources.get_db", models)
+    app = create_app("unit_testing")
+    return app

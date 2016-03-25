@@ -25,9 +25,16 @@ class Model(Resource):
         if self.version == "latest":
             try:
                 self.version = self.find_latest_version(self.version)
+	    except (TypeError, ValueError) as e:
+		current_app.logger.error("No model {} found".format(self.version))
+		raise e
+	    try:
                 self.model = self.load_model(self.version)
-            except (TypeError, ValueError):
-                current_app.logger.warning("No model {} found".format(self.version))
+	    except (pickle.UnpicklingError, AttributeError, EOFError, ImportError, IndexError) as e:
+		current_app.logger.error("Model {} could not be unpickled".format(self.version))
+		raise e
+	    if not hasattr(self.model, 'predict'):
+		raise NoPredictMethod
 
     def find_latest_version(self, version):
         """Find model with the highest version number in Redis."""
