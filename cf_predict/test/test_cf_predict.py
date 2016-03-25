@@ -29,18 +29,18 @@ class TestCf_predict:
 
     def test_no_model_in_db(self, monkeypatch, caplog):
         monkeypatch.setattr("cf_predict.resources.get_db", MockRedis)
-	pytest.raises(ValueError, self.client.get, "/model")
+        pytest.raises(ValueError, self.client.get, "/model")
         assert "No model" in caplog.text()
 
     def test_model_pickle_error(self, monkeypatch, caplog):
-	def broken_pickle(object):
-	    raise IOError
-	monkeypatch.setattr("pickle.loads", broken_pickle)
-	pytest.raises(IOError, self.client.get, "/model")
+        def broken_pickle(anything):
+            raise IOError
+        monkeypatch.setattr("pickle.loads", broken_pickle)
+        pytest.raises(IOError, self.client.get, "/model")
 
     def test_model_no_predict_error(self, monkeypatch, caplog, broken_model):
-	monkeypatch.setattr("cf_predict.resources.get_db", broken_model)
-	pytest.raises(NoPredictMethod, self.client.get, "/model")
+        monkeypatch.setattr("cf_predict.resources.get_db", broken_model)
+        pytest.raises(NoPredictMethod, self.client.get, "/model")
 
     def test_get_version(self):
         rv = self.client.get("/model")
@@ -49,22 +49,24 @@ class TestCf_predict:
             "model_version": "1.2.0"
         }
 
+    def test_post_prediction_valid_features(self):
         features = {"features": [1, 2, 3, 4, 5]}
-        model = pickle.loads(models()["1.2.0"])
+        model = pickle.loads(models().get("1.2.0"))
         rv = self.client.post("/model",
                               data=json.dumps(features),
                               content_type="application/json")
         assert rv.status_code == 200
         assert rv.json == {
-            "prediction": model.predict(np.array(features["features"].reshape(1, -1)))
+            "model_version": "1.2.0",
+            "prediction": list(model.predict(np.array(features["features"]).reshape(1, -1)))
         }
 
-    def test_get_prediction_invalid_features(self):
+    def test_post_prediction_invalid_features(self):
         features = {"features": [1, 2, "lol", 4, 5]}
         rv = self.client.post("/model",
                               data=json.dumps(features),
                               content_type="application/json")
         assert rv.status_code == 400
         assert rv.json == {
-            "message": "Features [1, 2, 'lol', 4, 5] do not match expected input"
+            "message": "Features [1, 2, 'lol', 4, 5] do not match expected input for model version 1.2.0"
         }

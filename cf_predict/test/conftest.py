@@ -46,6 +46,7 @@ def models():
 
 @pytest.fixture
 def broken_model():
+    """Create a non-functional model object."""
     r = MockRedis()
     r.set("1.2.0", pickle.dumps("lol"))
     return lambda: r

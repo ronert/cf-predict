@@ -1,6 +1,10 @@
 import pickle
+import json
 import os
+import numpy as np
+from flask_restful import Resource, request
 from flask import url_for, current_app
+from .errors import NoPredictMethod
 import cf_predict
 
 
@@ -25,20 +29,20 @@ class Model(Resource):
         if self.version == "latest":
             try:
                 self.version = self.find_latest_version(self.version)
-	    except (TypeError, ValueError) as e:
-		current_app.logger.error("No model {} found".format(self.version))
-		raise e
-	    try:
+            except (TypeError, ValueError) as e:
+                current_app.logger.error("No model {} found".format(self.version))
+                raise e
+            try:
                 self.model = self.load_model(self.version)
-	    except (pickle.UnpicklingError, AttributeError, EOFError, ImportError, IndexError) as e:
-		current_app.logger.error("Model {} could not be unpickled".format(self.version))
-		raise e
-	    if not hasattr(self.model, 'predict'):
-		raise NoPredictMethod
+            except (pickle.UnpicklingError, AttributeError, EOFError, ImportError, IndexError) as e:
+                current_app.logger.error("Model {} could not be unpickled".format(self.version))
+                raise e
+            if not hasattr(self.model, 'predict'):
+                raise NoPredictMethod
 
     def find_latest_version(self, version):
         """Find model with the highest version number in Redis."""
-	keys = [key.decode("utf-8") for key in self.r.scan_iter()]
+        keys = [key.decode("utf-8") for key in self.r.scan_iter()]
         latest_version = max(keys)
         return latest_version
 
@@ -55,9 +59,20 @@ class Model(Resource):
 
         Input: Feature array
         """
-        if self.model:
-            prediction = {"prediction": self.model.predict(features)}
-            return prediction
-        else:
-            message = {"message": "No model found"}
-            return message, 404
+        try:
+            raw_features = request.get_json()["features"]
+        except json.JSONDecodeError:
+            return {"message": "Invalid json {}".format(request.data)}, 400
+        except KeyError:
+            return {"message": "Features not found in {}".format(request.get_json())}, 400
+        try:
+            features = np.array(raw_features)
+            if len(features.shape) == 1:
+                features.reshape(1, -1)
+            prediction = self.model.predict(features)
+            return {
+                "model_version": self.version,
+                "prediction": list(prediction)
+            }
+        except ValueError:
+            return {"message": "Features {} do not match expected input for model version {}".format(raw_features, self.version)}, 400

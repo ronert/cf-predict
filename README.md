@@ -36,6 +36,8 @@ $ cd cf-predict
 $ python setup.py install
 ```
 
+### File Structure
+
 ## Basic Usage
 
 After installation, the package can imported:
