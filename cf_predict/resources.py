@@ -28,11 +28,10 @@ class Predict(Resource):
         if self.version == "latest":
             try:
                 self.version = self.find_latest_version(self.version)
+                self.model = self.load_model(self.version)
             except (TypeError, ValueError) as e:
                 current_app.logger.error("No model {} found".format(self.version))
                 raise e
-            try:
-                self.model = self.load_model(self.version)
             except (pickle.UnpicklingError, IOError, AttributeError, EOFError, ImportError, IndexError) as e:
                 current_app.logger.error("Model {} could not be unpickled".format(self.version))
                 raise e
@@ -60,9 +59,6 @@ class Predict(Resource):
         """
         try:
             raw_features = request.get_json()["features"]
-        except KeyError:
-            return {"message": "Features not found in {}".format(request.get_json())}, 400
-        try:
             features = np.array(raw_features)
             if len(features.shape) == 1:
                 features.reshape(1, -1)
@@ -71,5 +67,7 @@ class Predict(Resource):
                 "model_version": self.version,
                 "prediction": list(prediction)
             }
+        except KeyError:
+            return {"message": "Features not found in {}".format(request.get_json())}, 400
         except ValueError:
             return {"message": "Features {} do not match expected input for model version {}".format(raw_features, self.version)}, 400
