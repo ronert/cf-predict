@@ -42,6 +42,7 @@ class TestCf_predict:
     def test_model_no_predict_error(self, monkeypatch, caplog, broken_model):
         monkeypatch.setattr("cf_predict.resources.get_db", broken_model)
         pytest.raises(NoPredictMethod, self.client.get, "/predict")
+        assert "has no predict method" in caplog.text()
 
     def test_get_version(self):
         rv = self.client.get("/predict")

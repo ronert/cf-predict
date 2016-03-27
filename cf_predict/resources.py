@@ -36,6 +36,7 @@ class Predict(Resource):
                 current_app.logger.error("Model {} could not be unpickled".format(self.version))
                 raise e
             if not hasattr(self.model, 'predict'):
+                current_app.logger.error("Model {} has no predict method".format(self.version))
                 raise NoPredictMethod
 
     def find_latest_version(self, version):
