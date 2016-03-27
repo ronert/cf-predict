@@ -1,11 +1,12 @@
 aniso8601==1.1.0
-astroid==1.4.4
+astroid==1.4.5
 autopep8==1.2.2
 binaryornot==0.4.0
 bleach==1.4.2
+bumpversion==0.5.3
 chardet==2.3.0
 click==6.3
-colorama==0.3.6
+colorama==0.3.7
 cookiecutter==1.3.0
 coverage==4.0.3
 coveralls==1.1
@@ -38,6 +39,7 @@ mccabe==0.4.0
 mkdocs==0.15.3
 mkdocs-bootstrap==0.1.1
 mkdocs-bootswatch==0.4.0
+mockredis==0.1.3.dev0
 mockredispy==2.9.0.12
 nose==1.3.7
 numpy==1.10.4
@@ -53,8 +55,8 @@ ptyprocess==0.5.1
 py==1.4.31
 pyflakes==1.0.0
 Pygments==2.1.3
-pylint==1.5.4
-pytest==2.9.0
+pylint==1.5.5
+pytest==2.9.1
 pytest-capturelog==0.7
 pytest-cov==2.2.1
 pytest-describe==0.10.3
