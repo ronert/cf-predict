@@ -94,7 +94,7 @@ class TestCf_predict:
                               content_type="application/json")
         assert rv.status_code == 400
         assert rv.json == {
-            "message": "The browser (or proxy) sent a request that this server could not understand."
+            "message": "Failed to decode JSON object: Unterminated string starting at: line 1 column 2 (char 1)"
         }
 
     def test_post_prediction_wrong_key(self):
