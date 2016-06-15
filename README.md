@@ -48,6 +48,52 @@ $ python
 >>> cf_predict.__version__
 ```
 
+## Development
+
+### Make environment
+
+`make env`
+
+### Development Installation
+
+`make develop`
+
+### System Installation
+
+`make install`
+
+### Run All Tests
+
+`make tests`
+
+#### Unit Tests
+
+`make test-unit`
+
+#### Integration Tests
+
+`make test-int`
+
+#### Read Coverage
+
+`make read-coverage`
+
+### Run CI
+
+`make ci`
+
+### Static Analaysis
+
+`make check`
+
+### Watch
+
+`make watch`
+
+### Release
+
+`make upload`
+
 ## Documentation
 
 Read the full documentation [here](http://ronert.github.io/cf-predict).
