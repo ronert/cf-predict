@@ -94,14 +94,14 @@ $(INSTALLED_FLAG): Makefile setup.py requirements.txt
 	@ touch $(INSTALLED_FLAG)  # flag to indicate package is installed
 ifdef TRAVIS
 $(PIP):
-	if [ -n "$(CONDA_ENV_PATH)" ]; then . $(BIN)/deactivate; else exit 0; fi && conda env remove -p $(ENV)
+	if [ -n "$(CONDA_ENV_PATH)" ]; then . $(BIN)/deactivate; else exit 0; fi && conda remove -p $(ENV) --all -y
 	$(HOME)/anaconda/bin/conda create -y -p $(ENV) -q python=$(TRAVIS_PYTHON_VERSION) numpy scikit-learn pip wheel flask
-	. $(BIN)/activate $(ENV)/ && $(PIP) install flask-restful flask-redis mockredis coveralls
+	source activate $(ENV)/ && $(PIP) install flask-restful flask-redis mockredis coveralls
 else
 $(PIP):
-	if [ -n "$(CONDA_ENV_PATH)" ]; then . $(BIN)/deactivate; else exit 0; fi && conda env remove -p $(ENV)
+	if [ -n "$(CONDA_ENV_PATH)" ]; then . $(BIN)/deactivate; else exit 0; fi && conda remove -p $(ENV) --all -y
 	$(HOME)/anaconda/bin/conda create -y -p $(ENV) -q python=$(PYTHON_MAJOR).$(PYTHON_MINOR) numpy scikit-learn pip wheel flask
-	. $(BIN)/activate $(ENV)/ && $(PIP) install flask-restful flask-redis mockredis && \
+	source activate $(ENV)/ && $(PIP) install flask-restful flask-redis mockredis && \
 	$(PIP) install --upgrade pip
 endif
 
