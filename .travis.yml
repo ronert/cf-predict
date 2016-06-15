@@ -33,9 +33,9 @@ install:
   # Useful for debugging any issues with conda
   - conda info -a
   - if [ -d ${TRAVIS_BUILD_DIR}/env ]; then source deactivate ; conda env remove -p env/; fi
-  - conda create -y -p $TRAVIS_BUILD_DIR/env -q python=$TRAVIS_PYTHON_VERSION numpy scikit-learn pip wheel
+  - conda create -y -p $TRAVIS_BUILD_DIR/env -q python=$TRAVIS_PYTHON_VERSION numpy scikit-learn pip wheel flask
   - source activate env/
-  - pip install coveralls scrutinizer-ocular flask flask-restful flask-redis mockredis
+  - pip install coveralls scrutinizer-ocular flask-restful flask-redis mockredis
   - python setup.py install
 
 before_script:
