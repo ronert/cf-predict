@@ -29,22 +29,21 @@ class UnitTestingConfig(Config):
     DEBUG = True
 
 
-class IntegrationTestingConfig(Config):
-    TESTING = True
-    DEBUG = True
-
-
 class ProductionConfig(Config):
+    DEBUG = True  # TODO: remove
     if os.getenv("VCAP_SERVICES"):
         services = json.loads(os.getenv("VCAP_SERVICES"))
-        redis_env = services["p-redis"][0]["credentials"]
-        REDIS_URL = "redis://" + redis_env["password"] + "@" + redis_env["host"] + ":" + redis_env["port"]
+        if "p-redis" in services:
+            redis_env = services["p-redis"][0]["credentials"]
+            REDIS_URL = "redis://:" + redis_env["password"] + "@" + redis_env["host"] + ":" + str(redis_env["port"]) + "/0"
+        else:
+            redis_env = services["rediscloud"][0]["credentials"]
+            REDIS_URL = "redis://:" + redis_env["password"] + "@" + redis_env["hostname"] + ":" + str(redis_env["port"]) + "/0"
 
 
 config = {
     "development": DevelopmentConfig,
     "unit_testing": UnitTestingConfig,
-    "integration_testing": IntegrationTestingConfig,
     "production": ProductionConfig,
     "default": DevelopmentConfig
 }
