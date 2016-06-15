@@ -96,12 +96,12 @@ ifdef TRAVIS
 $(PIP):
 	if [ -n "$(CONDA_ENV_PATH)" ]; then . $(BIN)/deactivate; else exit 0; fi && conda remove -p $(ENV) --all -y
 	$(HOME)/anaconda/bin/conda create -y -p $(ENV) -q python=$(TRAVIS_PYTHON_VERSION) numpy scikit-learn pip wheel flask
-	source activate $(ENV)/ && $(PIP) install flask-restful flask-redis mockredis coveralls
+	source activate $(ENV)/ && $(PIP) install flask-restful flask-redis mockredispy coveralls
 else
 $(PIP):
 	if [ -n "$(CONDA_ENV_PATH)" ]; then . $(BIN)/deactivate; else exit 0; fi && conda remove -p $(ENV) --all -y
 	$(HOME)/anaconda/bin/conda create -y -p $(ENV) -q python=$(PYTHON_MAJOR).$(PYTHON_MINOR) numpy scikit-learn pip wheel flask
-	source activate $(ENV)/ && $(PIP) install flask-restful flask-redis mockredis && \
+	source activate $(ENV)/ && $(PIP) install flask-restful flask-redis mockredispy && \
 	$(PIP) install --upgrade pip
 endif
 
