@@ -4,8 +4,8 @@ applications:
   instances: 1
   memory: 1G
   # buildpack: https://github.com/cloudfoundry/python-buildpack
-  buildpack: https://github.com/ihuston/python-conda-buildpack
-  # buildpack: https://github.com/cloudfoundry/python-buildpack#develop
+  # buildpack: https://github.com/ihuston/python-conda-buildpack
+  buildpack: https://github.com/Dannyzen/python-buildpack#develop
   path: .
   command: make deploy
   services:

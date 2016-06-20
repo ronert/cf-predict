@@ -94,9 +94,9 @@ $(INSTALLED_FLAG): Makefile setup.py requirements.txt
 	@ touch $(INSTALLED_FLAG)  # flag to indicate package is installed
 ifdef TRAVIS
 $(PIP):
-	if [ -n "$(CONDA_ENV_PATH)" ]; then . $(BIN)/deactivate; else exit 0; fi && conda remove -p $(ENV) --all -y
-	$(HOME)/anaconda/bin/conda create -y -p $(ENV) -q python=$(TRAVIS_PYTHON_VERSION) numpy scikit-learn pip wheel flask
-	source activate $(ENV)/ && $(PIP) install flask-restful flask-redis mockredispy coveralls
+	if [ -n "$(CONDA_ENV_PATH)" ]; then . $(TRAVIS_BUILD_DIR)/$(BIN)/deactivate; else exit 0; fi && conda remove -p $(TRAVIS_BUILD_DIR)/$(ENV) --all -y
+	$(HOME)/anaconda/bin/conda create -y -p $(TRAVIS_BUILD_DIR)/$(ENV)/ -q python=$(TRAVIS_PYTHON_VERSION) numpy scikit-learn pip wheel flask
+	source activate $(TRAVIS_BUILD_DIR)/$(ENV)/ && $(TRAVIS_BUILD_DIR)/$(BIN)/$(PIP) install flask-restful flask-redis mockredispy coveralls
 else
 $(PIP):
 	if [ -n "$(CONDA_ENV_PATH)" ]; then . $(BIN)/deactivate; else exit 0; fi && conda remove -p $(ENV) --all -y

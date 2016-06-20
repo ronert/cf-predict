@@ -2,13 +2,12 @@ sudo: true
 
 language: python
 python:
-- 3.4
 - 3.5
 
 cache:
-  pip: true
-  directories:
-  - env
+  pip: false
+  # directories:
+  # - env
 
 env:
   global:
@@ -30,17 +29,17 @@ install:
   - hash -r
   - conda config --set always_yes yes --set changeps1 no
   - conda update -q conda
-  # Useful for debugging any issues with conda
+  - conda update -q conda-env
   - conda info -a
   - if [ -d ${TRAVIS_BUILD_DIR}/env ]; then source deactivate ; conda remove -p env/ --all -y; fi
   - conda create -y -p $TRAVIS_BUILD_DIR/env -q python=$TRAVIS_PYTHON_VERSION numpy scikit-learn pip wheel flask
-  - source activate env/
-  - pip install coveralls scrutinizer-ocular flask-restful flask-redis mockredispy
+  - source activate $TRAVIS_BUILD_DIR/env/
+  - $TRAVIS_BUILD_DIR/env/bin/pip install coveralls scrutinizer-ocular flask-restful flask-redis mockredispy
   - python setup.py install
 
 before_script:
-- make env
-- make depends-ci
+# - make env
+# - make depends-ci
 
 script:
 - make ci
