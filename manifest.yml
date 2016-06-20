@@ -1,0 +1,15 @@
+---
+applications:
+- name: cf-predict
+  instances: 1
+  memory: 1G
+  # buildpack: https://github.com/cloudfoundry/python-buildpack
+  buildpack: https://github.com/ihuston/python-conda-buildpack
+  # buildpack: https://github.com/cloudfoundry/python-buildpack#develop
+  path: .
+  command: make deploy
+  services:
+    - redis
+  env:
+    FLASK_CONFIG: "production"
+    MODEL_VERSION: "latest"
