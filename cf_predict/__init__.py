@@ -8,7 +8,7 @@ from .config import config
 from .api import api_bp
 
 __project__ = 'cf-predict'
-__version__ = '0.1.1'
+__version__ = '0.1.2'
 
 VERSION = "{0} v{1}".format(__project__, __version__)
 
