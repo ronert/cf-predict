@@ -1,0 +1,7 @@
+#!/bin/bash
+
+cf dev start && /
+cf api api.local.pcfdev.io --skip-ssl-validation && /
+cf login -u admin -p admin && /
+cf create-service p-redis shared-vm redis && /
+cf push
